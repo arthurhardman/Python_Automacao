@@ -27,6 +27,8 @@ for linha in tabela.index:
 
 navegador.quit()
 
+# Avaliar quanto precisa tirar no segundo BI para passar:
+
 tabela["Notas 2 - BI"] = 14.0 - tabela["Notas 1 - BI"]
 
 tabela["Aprovado/Reprovado"] = (tabela["Notas 2 - BI"] + tabela["Notas 1 - BI"])/ 2.0 >= 7.0
