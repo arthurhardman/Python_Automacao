@@ -1,0 +1,36 @@
+from selenium import webdriver as wd
+import pandas as pd
+
+navegador = wd.Chrome()
+tabela = pd.read_excel("notas.xlsx")
+    
+link = "https://aluno.uvv.br/?_ga=2.99779870.1861825378.1684411425-274275227.1683890823"
+navegador.get(link)
+
+    # LOGIN NO SISTEMA:
+navegador.find_element('xpath', '//*[@id="Matricula"]').send_keys('login')
+navegador.find_element('xpath', '//*[@id="Password"]').send_keys('senha')
+navegador.find_element('xpath', '//*[@id="PageWrapper"]/div/div/div[1]/div/form/div[3]/div[1]/button').click()
+
+    # IR NO BOLETIM:
+for linha in tabela.index:
+    
+    numero = tabela.loc[linha, "Linhas"]
+
+    navegador.find_element('xpath', '//*[@id="side-menu"]/li[12]/a').click()
+    nota_elemento = navegador.find_element('xpath',f'//*[@id="page-wrapper"]/div/div/div[2]/div/div[2]/div/table/tbody/tr[{numero}]/td[4]')
+    valor = nota_elemento.text.strip()
+    valor = valor.replace(",", ".")
+    valor = float(valor)
+    
+    tabela.loc[linha,"Notas 1 - BI"] = valor
+
+navegador.quit()
+
+tabela["Notas 2 - BI"] = 14.0 - tabela["Notas 1 - BI"]
+
+tabela["Aprovado/Reprovado"] = (tabela["Notas 2 - BI"] + tabela["Notas 1 - BI"])/ 2.0 >= 7.0
+tabela["Aprovado/Reprovado"] = tabela["Aprovado/Reprovado"].replace({True: "Aprovado", False: "Reprovado"})
+display(tabela)
+
+tabela.to_excel("Notas.xlsx", index=False)
